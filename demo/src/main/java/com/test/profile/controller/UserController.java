@@ -4,9 +4,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import com.test.profile.entity.User;
-import com.test.profile.service.impl.UserServiceImpl;
+import com.test.profile.exception.ResourceNotFoundException;
+import com.test.profile.service.UserServiceImpl;
 
 @RestController
 @RequestMapping("/users")
@@ -20,14 +20,14 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<User> saveUser(@RequestBody User user) {
-        User savedUser = userServiceImpl.saveUser(user);
-        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);
+    public ResponseEntity<User> saveUser(@RequestBody User email) {
+        User savedUser = userServiceImpl.saveUser(email);
+        return new ResponseEntity<>(savedUser, HttpStatus.CREATED);      //.body(savedUser);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Long id) {
-        User user = userServiceImpl.getUser(id);
+    @GetMapping("/{email}")
+    public ResponseEntity<User> getUser(@PathVariable String email) {
+        User user = userServiceImpl.getUser(email);
         if (user != null) {
             return new ResponseEntity<>(user, HttpStatus.OK);
         } else {
@@ -35,15 +35,21 @@ public class UserController {
         }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id) {
-        User updatedUser = userServiceImpl.putUser(id);
-        return new ResponseEntity<>(updatedUser, HttpStatus.OK);
+
+    
+    @PutMapping("/{email}")
+    public ResponseEntity<User> updateUser(@PathVariable("email") String email, @RequestBody User newUser) {
+        try {
+            User updatedUser = userServiceImpl.putUser(email, newUser);
+            return ResponseEntity.ok().body(updatedUser);
+        } catch (ResourceNotFoundException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userServiceImpl.DeleteUser(id);
+    @DeleteMapping("/{email}")
+    public ResponseEntity<String> deleteUser(@PathVariable String email) {
+        userServiceImpl.deleteUser(email);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

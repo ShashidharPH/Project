@@ -10,15 +10,16 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
+//@AllArgsConstructor
 @NoArgsConstructor
 @Builder
 public class ApiResponse {
 
-	public ApiResponse(String message, boolean success) {
+	public ApiResponse(String message, boolean success , HttpStatus status) {
 		super();
 		this.message = message;
 		this.success = success;
+		this.status = status;
 	}
 	private String message;
 	private boolean success;

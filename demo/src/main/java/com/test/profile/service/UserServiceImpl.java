@@ -5,11 +5,17 @@ import java.util.Optional;
 import org.hibernate.annotations.DynamicUpdate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.test.profile.entity.User;
+import com.test.profile.exception.DeletedException;
 import com.test.profile.exception.ResourceNotFoundException;
 import com.test.profile.repository.userRepository;
+
+//import jakarta.transaction.Transactional;
 @DynamicUpdate
 @Service
 public class UserServiceImpl implements UserService {
@@ -24,23 +30,14 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public User getUser(Long u_id) {
-		 Optional<User> userOptional = userRepository.findById(u_id);
-	        return userOptional.orElse(null);
+	public User getUser(String email) {
+		 Optional<User> userOptional = userRepository.findByEmail(email);
+	        return userOptional.orElseThrow(() -> new ResourceNotFoundException() );
 	}
-//   @Override
-//	public User putUser(Long u_id) throws ResourceNotFoundException {
-//		Optional<User> userOptional = userRepository.findById(u_id);
-//        if (userOptional.isPresent()) {
-//            User user = userOptional.get();
-//            return userRepository.save(user);
-//        }  
-//           throw new ResourceNotFoundException("Given id not found: ");
-//        
-//	}
 
-	 public User putUser(Long u_id, User newUser) throws ResourceNotFoundException {
-	        Optional<User> userOptional = userRepository.findById(u_id);
+
+	 public User putUser(String email, User newUser) throws ResourceNotFoundException {
+	        Optional<User> userOptional = userRepository.findByEmail(email);
 	        if (userOptional.isPresent()) {
 	            User user = userOptional.get();
 	            
@@ -61,14 +58,30 @@ public class UserServiceImpl implements UserService {
 	            // Save the updated user
 	            return userRepository.save(user);
 	        } else {
-	            throw new ResourceNotFoundException("Given id not found: " + u_id);
+	            throw new ResourceNotFoundException("Given id not found: " );
 	        }
 	    }
    			
 	
 	@Override
-	public void deleteUser(Long u_id) {
+//	public void deleteUser(String email) throws DeletedException {
+//		if(email != null) {
+//		 userRepository.deleteByEmail(email);
+//		System.out.println("User deleted");
+//		   throw new DeletedException();
+//	        }
+//		}
+	
 
-		userRepository.deleteById(u_id);
+	 @Transactional(rollbackFor = DeletedException.class)// Ensure transactional behavior and rollback for DeletedException
+    public void deleteUser(String email) throws DeletedException {
+        if (email != null) {
+            userRepository.deleteByEmail(email);
+            System.out.println("User deleted");
+            throw new DeletedException();
+        } else {
+            throw new IllegalArgumentException("Email cannot be null"); // Throw exception for null email
+        }
     }
+	
 }

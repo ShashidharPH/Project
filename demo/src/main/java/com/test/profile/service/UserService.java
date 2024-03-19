@@ -7,12 +7,12 @@ public interface UserService {
 	
 	User saveUser(User user);
 	//get single user of given userId
-	User getUser(Long u_id);
+	User getUser(String email);
 	
-	User putUser(Long u_id);
+	//User putUser(Long u_id);
+	User putUser(String email,User user);
 	
-	void DeleteUser(Long u_id);
-	
+	void deleteUser(String  email);
 	
 
 }
