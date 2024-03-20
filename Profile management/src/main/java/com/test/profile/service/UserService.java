@@ -12,7 +12,8 @@ public interface UserService {
 	//User putUser(Long u_id);
 	User putUser(String email,User user);
 	
-	void deleteUser(String  email);
+	//void deleteUser(String  email);
+	void deleteAllByEmail(String email);
 	
 
 }

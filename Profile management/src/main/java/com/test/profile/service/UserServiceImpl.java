@@ -1,5 +1,6 @@
 package com.test.profile.service;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.annotations.DynamicUpdate;
@@ -22,6 +23,9 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	private userRepository userRepository;
+	
+//	@Autowired
+//	private UserService userService;
 	
 	
 	@Override
@@ -63,7 +67,7 @@ public class UserServiceImpl implements UserService {
 	    }
    			
 	
-	@Override
+//	@Override
 //	public void deleteUser(String email) throws DeletedException {
 //		if(email != null) {
 //		 userRepository.deleteByEmail(email);
@@ -72,16 +76,22 @@ public class UserServiceImpl implements UserService {
 //	        }
 //		}
 	
-
-	 @Transactional(rollbackFor = DeletedException.class)// Ensure transactional behavior and rollback for DeletedException
-    public void deleteUser(String email) throws DeletedException {
-        if (email != null) {
-            userRepository.deleteByEmail(email);
-            System.out.println("User deleted");
-            throw new DeletedException();
-        } else {
-            throw new IllegalArgumentException("Email cannot be null"); // Throw exception for null email
-        }
-    }
 	
+	 
+	 
+	 public void deleteAllByEmail(String email) throws DeletedException {
+	        // Find the user by email
+	        Optional<User> userOptional = userRepository.findByEmail(email);
+
+	        // Extract the actual User object from Optional
+	        User user = userOptional.orElse(null);
+
+	        // Delete the user if found
+	        if (user != null) {
+	            userRepository.delete(user);
+	            throw new DeletedException();
+	        }  else {
+	            throw new IllegalArgumentException("Email cannot be null"); // Throw exception for null email
+	        }
+	    }
 }

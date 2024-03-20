@@ -49,7 +49,7 @@ public class UserController {
 
     @DeleteMapping("/{email}")
     public ResponseEntity<String> deleteUser(@PathVariable String email) {
-        userServiceImpl.deleteUser(email);
+        userServiceImpl.deleteAllByEmail(email);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
